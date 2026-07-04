@@ -48,6 +48,7 @@
     History as HistoryIcon,
   } from "lucide-svelte";
   import { getSidebarReportItems } from "$lib/navigation/report-navigation";
+  import { parseTenantHost, tenantUrl } from "$lib/utils/tenant-host";
   import type { AuthUser } from "$lib/stores/auth-store.svelte";
 
   interface Props {
@@ -107,11 +108,9 @@
   // Derive subdomain info from hostname
   $effect(() => {
     if (!browser) return;
-    const parts = window.location.hostname.split(".");
-    if (parts.length > 2 && window.location.hostname !== "localhost") {
-      currentSlug = parts[0];
-      baseDomain = parts.slice(1).join(".");
-    }
+    const info = parseTenantHost(window.location.hostname);
+    currentSlug = info.currentSlug;
+    baseDomain = info.baseDomain;
   });
 
   // Available tenants for the subdomain switcher.
@@ -126,8 +125,7 @@
         : (tenantTargets.find((t) => t.id === value)?.slug ?? null);
 
     if (targetSlug && targetSlug !== currentSlug) {
-      const host = `${targetSlug}.${baseDomain}`;
-      window.location.href = `${window.location.protocol}//${host}/`;
+      window.location.href = tenantUrl(targetSlug, baseDomain);
     }
   }
 
@@ -212,6 +210,15 @@
     // Guest sessions only see read-only navigation
     if (isGuestSession) {
       return items.filter((i) => guestNavTitles.has(i.title));
+    }
+
+    // Cross-tenant overview: only meaningful when the user belongs to more than one tenant.
+    if (totalTenantCount > 1) {
+      items.push({
+        title: "Tenants",
+        href: "/tenants",
+        icon: Users,
+      });
     }
 
     items.push(
