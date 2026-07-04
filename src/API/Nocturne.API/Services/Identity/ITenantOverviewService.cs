@@ -1,4 +1,5 @@
 using Nocturne.Core.Contracts.Multitenancy;
+using Nocturne.Infrastructure.Data.Entities;
 
 namespace Nocturne.API.Services.Identity;
 
@@ -18,4 +19,20 @@ public interface ITenantOverviewService
     /// </summary>
     Task<TenantOverviewResponse> GetOverviewAsync(
         Guid subjectId, IReadOnlySet<string> tokenScopes, CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns every active tenant the subject may read glucose for: active memberships
+    /// (revoked ones are excluded by the global query filter) whose effective permissions,
+    /// intersected with <paramref name="tokenScopes"/>, satisfy
+    /// <see cref="Core.Models.Authorization.TenantPermissions.GlucoseRead"/>. This is the
+    /// authorization core shared by <see cref="GetOverviewAsync"/> and the overview hub.
+    /// </summary>
+    Task<IReadOnlyList<GlucoseReadTenant>> GetGlucoseReadTenantsAsync(
+        Guid subjectId, IReadOnlySet<string> tokenScopes, CancellationToken ct = default);
 }
+
+/// <summary>
+/// A tenant the subject may read glucose for, with the scopes the membership
+/// allows the caller's token on that tenant.
+/// </summary>
+public sealed record GlucoseReadTenant(TenantEntity Tenant, IReadOnlySet<string> AllowedScopes);
