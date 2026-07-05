@@ -146,6 +146,10 @@ public static class ServiceRegistrationExtensions
         services.Configure<GitHubIssueOptions>(configuration.GetSection("GitHub"));
         services.AddSingleton<GitHubIssueService>();
 
+        // GitHub translation contribution PRs
+        services.Configure<GitHubTranslationOptions>(configuration.GetSection("GitHub"));
+        services.AddSingleton<GitHubTranslationService>();
+
         return services;
     }
 
@@ -364,6 +368,22 @@ public static class ServiceRegistrationExtensions
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 5,
+                            Window = TimeSpan.FromHours(1),
+                            QueueLimit = 0,
+                        }
+                    )
+            );
+
+            // Translation contributions: 10 per IP per hour (each opens an
+            // upstream PR, directly or via the relay).
+            options.AddPolicy(
+                "translation-contributions",
+                context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
                             Window = TimeSpan.FromHours(1),
                             QueueLimit = 0,
                         }
