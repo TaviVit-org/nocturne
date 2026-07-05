@@ -92,7 +92,7 @@ public class GitHubTranslationServiceTests
             {
                 Text = "",
                 Applied = 1,
-                Unmatched = ["evil\n</details>\n# heading"],
+                Unmatched = [new TranslationUnmatchedEntry { MsgId = "evil\n</details>\n# heading" }],
             });
 
         body.Should().NotContain("evil\n");
@@ -108,12 +108,12 @@ public class GitHubTranslationServiceTests
             {
                 Text = "",
                 Applied = 2,
-                Unmatched = ["Gone message"],
+                Unmatched = [new TranslationUnmatchedEntry { MsgId = "Gone message", Context = "page-title" }],
             });
 
         body.Should().Contain("**Contributor:** Jane Doe (@janedoe)");
         body.Should().Contain("**Messages updated:** 2");
-        body.Should().Contain("`Gone message`");
+        body.Should().Contain("`Gone message` (context: page-title)");
         body.Should().Contain("## Contributor note");
         body.Should().Contain("Reviewed against the app UI");
     }

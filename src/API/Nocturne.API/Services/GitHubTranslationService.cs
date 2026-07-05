@@ -273,12 +273,15 @@ public class GitHubTranslationService(
             sb.AppendLine();
             // msgids are arbitrary contributor input echoed into markdown:
             // keep them on one line inside the code span or they escape it.
-            foreach (var msgId in result.Unmatched.Take(50))
+            foreach (var entry in result.Unmatched.Take(50))
             {
-                var display = msgId.Replace("\r", "").Replace("\n", "\\n").Replace("`", "\\`");
+                var display = entry.MsgId.Replace("\r", "").Replace("\n", "\\n").Replace("`", "\\`");
                 if (display.Length > 120)
                     display = display[..120] + "…";
-                sb.AppendLine($"- `{display}`");
+                var context = entry.Context.Length == 0
+                    ? ""
+                    : $" (context: {SanitizeMetadata(entry.Context)})";
+                sb.AppendLine($"- `{display}`{context}");
             }
             sb.AppendLine();
             sb.AppendLine("</details>");

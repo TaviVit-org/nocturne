@@ -1,4 +1,5 @@
 using System.Text;
+using Nocturne.Core.Models.Translations;
 
 namespace Nocturne.API.Services;
 
@@ -6,7 +7,7 @@ public record PoEditResult
 {
     public required string Text { get; init; }
     public int Applied { get; init; }
-    public IReadOnlyList<string> Unmatched { get; init; } = [];
+    public IReadOnlyList<TranslationUnmatchedEntry> Unmatched { get; init; } = [];
 }
 
 /// <summary>
@@ -64,7 +65,7 @@ public static class PoCatalogEditor
 
         var unmatched = entries.Keys
             .Where(k => !matchedKeys.Contains(k))
-            .Select(k => k.MsgId)
+            .Select(k => new TranslationUnmatchedEntry { MsgId = k.MsgId, Context = k.Context })
             .ToList();
 
         return new PoEditResult
