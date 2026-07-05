@@ -105,6 +105,7 @@ import {
   TlsAuthorizationClient,
   TotpClient,
   TrackersClient,
+  TranslationsClient,
   UISettingsClient,
   UploaderSnapshotClient,
   UserPreferencesClient,
@@ -219,6 +220,7 @@ export class ApiClient {
   public readonly tlsAuthorization: TlsAuthorizationClient;
   public readonly totp: TotpClient;
   public readonly trackers: TrackersClient;
+  public readonly translations: TranslationsClient;
   public readonly uiSettings: UISettingsClient;
   public readonly uploaderSnapshot: UploaderSnapshotClient;
   public readonly userPreferences: UserPreferencesClient;
@@ -333,6 +335,7 @@ export class ApiClient {
     this.tlsAuthorization = new TlsAuthorizationClient(apiBaseUrl, http);
     this.totp = new TotpClient(apiBaseUrl, http);
     this.trackers = new TrackersClient(apiBaseUrl, http);
+    this.translations = new TranslationsClient(apiBaseUrl, http);
     this.uiSettings = new UISettingsClient(apiBaseUrl, http);
     this.uploaderSnapshot = new UploaderSnapshotClient(apiBaseUrl, http);
     this.userPreferences = new UserPreferencesClient(apiBaseUrl, http);
