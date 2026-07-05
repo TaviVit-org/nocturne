@@ -31,7 +31,7 @@ public record SubmitTranslationDraftsRequest
 public partial class TranslationsController(
     ITranslationContributionService translationService,
     ITranslationDraftService draftService,
-    IOptions<GitHubTranslationOptions> options,
+    IOptions<GitHubContributionOptions> options,
     ILogger<TranslationsController> logger) : ControllerBase
 {
     // Large enough for a full-locale submission (the catalog is ~4.7k
