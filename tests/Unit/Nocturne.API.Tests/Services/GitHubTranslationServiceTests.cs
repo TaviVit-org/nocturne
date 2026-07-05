@@ -1,4 +1,5 @@
 using Nocturne.API.Services;
+using Nocturne.Core.Models.Translations;
 
 namespace Nocturne.API.Tests.Services;
 
