@@ -13,11 +13,10 @@ import { sequence } from "@sveltejs/kit/hooks";
 import type { AuthUser } from "./app.d";
 import { AUTH_COOKIE_NAMES } from "$lib/config/auth-cookies";
 import { getOriginalProto, getEffectiveHost, getOriginalHost, isShareHost } from "$lib/server/request-host";
-// WUCHALE-DISABLED: wuchale temporarily disabled
-// import { runWithLocale, loadLocales } from 'wuchale/load-utils/server';
-// import * as main from '../../../locales/main.loader.server.svelte.js'
-// import * as js from '../../../locales/js.loader.server.js'
-// import { locales } from '../../../locales/data.js'
+import { runWithLocale, loadLocales } from 'wuchale/load-utils/server';
+import * as main from '../../../locales/main.loader.server.svelte.js'
+import * as js from '../../../locales/js.loader.server.js'
+import { locales } from '../../../locales/data.js'
 import supportedLocales from '../../../supportedLocales.json';
 import { LANGUAGE_COOKIE_NAME } from "$lib/stores/appearance-store.svelte";
 
@@ -35,7 +34,9 @@ function isPublicRoute(pathname: string): boolean {
   );
 }
 
-// WUCHALE-DISABLED: wuchale temporarily disabled — locale catalogs not loaded at startup
+// load at server startup
+loadLocales(main.key, main.loadCount, main.loadCatalog, locales)
+loadLocales(js.key, js.loadCount, js.loadCatalog, locales)
 
 // Turn off SSL validation during development for self-signed certs
 if (dev) {
@@ -509,13 +510,9 @@ function resolveLocale(event: Parameters<Handle>[0]["event"]): string {
   return "en";
 }
 
-// WUCHALE-DISABLED: wuchale temporarily disabled — resolveLocale still runs (so cookie-driven
-// locale selection logic stays exercised and helpers stay referenced) but
-// no runWithLocale wrapping happens. Re-enabling wuchale only requires
-// restoring the runWithLocale call below.
 export const locale: Handle = async ({ event, resolve }) => {
-  resolveLocale(event);
-  return resolve(event);
+  const locale = resolveLocale(event);
+  return await runWithLocale(locale, () => resolve(event));
 }
 
 // Reset bits-ui's global ID counter at the start of each SSR request so that
